@@ -1,21 +1,24 @@
 {
-  "name": "app-inventory",
+  "name": "electronic-store-inventory",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Inventory management app for an electronic store",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "setup-db": "node scripts/setup-database.js",
+    "seed-db": "node scripts/seed-database.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/itspep/app-inventory.git"
-  },
-  "keywords": [],
+  "keywords": ["inventory", "electronics", "store", "management"],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/itspep/app-inventory/issues"
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "method-override": "^3.0.0",
+    "pg": "^8.11.3"
   },
-  "homepage": "https://github.com/itspep/app-inventory#readme"
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
 }
