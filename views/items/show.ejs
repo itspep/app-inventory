@@ -1,0 +1,110 @@
+<div class="page-header">
+    <div class="breadcrumb">
+        <a href="/categories/<%= item.category_id %>"><i class="fas fa-arrow-left"></i> Back to <%= item.category_name %></a>
+    </div>
+    <div class="header-content">
+        <h1><i class="fas fa-box"></i> <%= item.name %></h1>
+        <div class="header-actions">
+            <a href="/items/<%= item.id %>/edit" class="btn btn-secondary">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="/items/<%= item.id %>/delete" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="item-detail">
+    <div class="item-detail-main">
+        <div class="item-image">
+            <% if (item.image_url) { %>
+                <img src="<%= item.image_url %>" alt="<%= item.name %>" class="item-detail-image">
+            <% } else { %>
+                <div class="item-image-placeholder">
+                    <i class="fas fa-box fa-5x"></i>
+                    <p>No image available</p>
+                </div>
+            <% } %>
+        </div>
+        
+        <div class="item-info">
+            <div class="info-section">
+                <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Category:</span>
+                        <span class="info-value">
+                            <a href="/categories/<%= item.category_id %>"><%= item.category_name %></a>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Brand:</span>
+                        <span class="info-value"><%= item.brand || '—' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Model:</span>
+                        <span class="info-value"><%= item.model || '—' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">SKU:</span>
+                        <span class="info-value"><%= item.sku || '—' %></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3><i class="fas fa-chart-line"></i> Inventory & Pricing</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Price:</span>
+                        <span class="info-value price">$<%= parseFloat(item.price).toFixed(2) %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Stock Quantity:</span>
+                        <span class="info-value">
+                            <span class="badge <%= item.stock_quantity > 10 ? 'badge-success' : item.stock_quantity > 0 ? 'badge-warning' : 'badge-danger' %>">
+                                <%= item.stock_quantity %> units
+                            </span>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Total Value:</span>
+                        <span class="info-value">
+                            $<%= (item.price * item.stock_quantity).toFixed(2) %>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Last Updated:</span>
+                        <span class="info-value">
+                            <%= new Date(item.updated_at).toLocaleString() %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="item-detail-secondary">
+        <div class="info-section">
+            <h3><i class="fas fa-align-left"></i> Description</h3>
+            <div class="description-content">
+                <%= item.description || '<p class="text-muted">No description provided.</p>' %>
+            </div>
+        </div>
+
+        <% if (item.specifications && Object.keys(item.specifications).length > 0) { %>
+            <div class="info-section">
+                <h3><i class="fas fa-cogs"></i> Specifications</h3>
+                <div class="specs-grid">
+                    <% Object.entries(item.specifications).forEach(([key, value]) => { %>
+                        <div class="spec-item">
+                            <span class="spec-label"><%= key.replace(/_/g, ' ').toUpperCase() %>:</span>
+                            <span class="spec-value"><%= value %></span>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>

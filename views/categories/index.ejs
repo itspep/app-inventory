@@ -1,0 +1,50 @@
+<div class="page-header">
+    <h1><i class="fas fa-list"></i> Categories</h1>
+    <a href="/categories/new" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add New Category
+    </a>
+</div>
+
+<% if (categories.length === 0) { %>
+    <div class="empty-state">
+        <i class="fas fa-inbox fa-3x"></i>
+        <h3>No Categories Found</h3>
+        <p>Get started by creating your first category.</p>
+        <a href="/categories/new" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create Category
+        </a>
+    </div>
+<% } else { %>
+    <div class="grid-view">
+        <% categories.forEach(category => { %>
+            <div class="card">
+                <div class="card-header">
+                    <h3><%= category.name %></h3>
+                    <div class="card-actions">
+                        <a href="/categories/<%= category.id %>" class="btn-icon" title="View">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="/categories/<%= category.id %>/edit" class="btn-icon" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="/categories/<%= category.id %>/delete" class="btn-icon btn-danger" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p><%= category.description || 'No description provided.' %></p>
+                    <div class="card-meta">
+                        <span><i class="fas fa-calendar"></i> Created: <%= new Date(category.created_at).toLocaleDateString() %></span>
+                        <span><i class="fas fa-sync"></i> Updated: <%= new Date(category.updated_at).toLocaleDateString() %></span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="/categories/<%= category.id %>" class="btn btn-secondary">
+                        <i class="fas fa-boxes"></i> View Items
+                    </a>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+<% } %>

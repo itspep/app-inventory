@@ -1,0 +1,82 @@
+<div class="page-header">
+    <div class="breadcrumb">
+        <a href="/categories"><i class="fas fa-arrow-left"></i> Back to Categories</a>
+    </div>
+    <div class="header-content">
+        <div>
+            <h1><i class="fas fa-folder"></i> <%= category.name %></h1>
+            <p class="category-description"><%= category.description || 'No description provided.' %></p>
+        </div>
+        <div class="header-actions">
+            <a href="/categories/<%= category.id %>/edit" class="btn btn-secondary">
+                <i class="fas fa-edit"></i> Edit Category
+            </a>
+            <a href="/items/new?category=<%= category.id %>" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Item
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-boxes"></i> Items in this Category</h2>
+    
+    <% if (items.length === 0) { %>
+        <div class="empty-state">
+            <i class="fas fa-box-open fa-3x"></i>
+            <h3>No Items Found</h3>
+            <p>This category doesn't have any items yet.</p>
+            <a href="/items/new?category=<%= category.id %>" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add First Item
+            </a>
+        </div>
+    <% } else { %>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Brand</th>
+                        <th>Model</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% items.forEach(item => { %>
+                        <tr>
+                            <td>
+                                <strong><%= item.name %></strong>
+                                <% if (item.sku) { %>
+                                    <br><small class="text-muted">SKU: <%= item.sku %></small>
+                                <% } %>
+                            </td>
+                            <td><%= item.brand || '—' %></td>
+                            <td><%= item.model || '—' %></td>
+                            <td>$<%= parseFloat(item.price).toFixed(2) %></td>
+                            <td>
+                                <span class="badge <%= item.stock_quantity > 10 ? 'badge-success' : item.stock_quantity > 0 ? 'badge-warning' : 'badge-danger' %>">
+                                    <%= item.stock_quantity %> in stock
+                                </span>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a href="/items/<%= item.id %>" class="btn-icon" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="/items/<%= item.id %>/edit" class="btn-icon" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="/items/<%= item.id %>/delete" class="btn-icon btn-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    <% } %>
+</div>

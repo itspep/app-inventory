@@ -1,0 +1,58 @@
+<div class="page-header">
+    <h1><i class="fas fa-search"></i> Search Results</h1>
+    <div class="search-summary">
+        <% if (query) { %>
+            <p>Search results for: "<strong><%= query %></strong>"</p>
+        <% } %>
+    </div>
+</div>
+
+<% if (items.length === 0) { %>
+    <div class="empty-state">
+        <i class="fas fa-search fa-3x"></i>
+        <h3>No Items Found</h3>
+        <p>No items match your search criteria.</p>
+        <div class="empty-state-actions">
+            <a href="/items" class="btn btn-secondary">
+                <i class="fas fa-boxes"></i> View All Items
+            </a>
+            <a href="/items/new" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Item
+            </a>
+        </div>
+    </div>
+<% } else { %>
+    <div class="search-results">
+        <p class="results-count"><%= items.length %> item(s) found</p>
+        
+        <div class="grid-view">
+            <% items.forEach(item => { %>
+                <div class="card">
+                    <% if (item.image_url) { %>
+                        <div class="card-image">
+                            <img src="<%= item.image_url %>" alt="<%= item.name %>">
+                        </div>
+                    <% } %>
+                    <div class="card-body">
+                        <h3><%= item.name %></h3>
+                        <p class="category-badge">
+                            <i class="fas fa-folder"></i> <%= item.category_name %>
+                        </p>
+                        <p class="item-description"><%= item.description?.substring(0, 100) || 'No description' %>...</p>
+                        <div class="item-meta">
+                            <span class="price">$<%= parseFloat(item.price).toFixed(2) %></span>
+                            <span class="stock <%= item.stock_quantity > 10 ? 'in-stock' : item.stock_quantity > 0 ? 'low-stock' : 'out-of-stock' %>">
+                                <%= item.stock_quantity %> in stock
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="/items/<%= item.id %>" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+<% } %>
