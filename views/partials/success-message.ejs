@@ -1,0 +1,27 @@
+<% if (success) { %>
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle"></i> 
+        <div class="alert-content">
+            <strong>Success!</strong> <%= success %>
+            <% if (action === 'create' && item) { %>
+                <div class="alert-actions">
+                    <a href="/items/<%= item.id %>" class="btn btn-sm btn-outline">
+                        <i class="fas fa-eye"></i> View Item
+                    </a>
+                    <a href="/items/new" class="btn btn-sm btn-outline">
+                        <i class="fas fa-plus"></i> Add Another
+                    </a>
+                </div>
+            <% } else if (action === 'create' && category) { %>
+                <div class="alert-actions">
+                    <a href="/categories/<%= category.id %>" class="btn btn-sm btn-outline">
+                        <i class="fas fa-eye"></i> View Category
+                    </a>
+                    <a href="/categories/new" class="btn btn-sm btn-outline">
+                        <i class="fas fa-plus"></i> Add Another
+                    </a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+<% } %>
