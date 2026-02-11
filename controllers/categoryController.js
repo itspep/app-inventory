@@ -4,18 +4,21 @@ const categoryController = {
   // List all categories
   listCategories: async (req, res) => {
     try {
+      console.log('📋 Listing categories...');
       const categories = await Category.getAll();
+      console.log(`✅ Found ${categories.length} categories`);
+      
       res.render('categories/index', { 
         title: 'Categories',
-        categories,
+        categories: categories || [],
         success: req.query.success,
         error: req.query.error
       });
     } catch (error) {
-      console.error('Error listing categories:', error);
+      console.error('❌ Error listing categories:', error);
       res.status(500).render('error', {
-        error: 'Server Error',
-        message: 'Failed to load categories'
+        error: 'Database Error',
+        message: 'Failed to load categories. Please check database connection.'
       });
     }
   },
@@ -24,9 +27,11 @@ const categoryController = {
   showCategory: async (req, res) => {
     try {
       const categoryId = parseInt(req.params.id);
+      console.log(`👀 Showing category ${categoryId}...`);
+      
       const data = await Category.getWithItems(categoryId);
       
-      if (!data.category) {
+      if (!data || !data.category) {
         return res.status(404).render('error', {
           error: 'Not Found',
           message: 'Category not found'
@@ -36,10 +41,10 @@ const categoryController = {
       res.render('categories/show', {
         title: data.category.name,
         category: data.category,
-        items: data.items
+        items: data.items || []
       });
     } catch (error) {
-      console.error('Error showing category:', error);
+      console.error('❌ Error showing category:', error);
       res.status(500).render('error', {
         error: 'Server Error',
         message: 'Failed to load category'
@@ -72,7 +77,7 @@ const categoryController = {
       
       res.redirect('/categories?success=Category created successfully');
     } catch (error) {
-      console.error('Error creating category:', error);
+      console.error('❌ Error creating category:', error);
       
       if (error.code === '23505') { // Unique violation
         res.render('categories/new', {
@@ -107,7 +112,7 @@ const categoryController = {
         category
       });
     } catch (error) {
-      console.error('Error loading edit form:', error);
+      console.error('❌ Error loading edit form:', error);
       res.status(500).render('error', {
         error: 'Server Error',
         message: 'Failed to load edit form'
@@ -115,26 +120,49 @@ const categoryController = {
     }
   },
 
-  // Update category
+  // Update category (enhanced with change tracking)
   updateCategory: async (req, res) => {
     try {
       const categoryId = parseInt(req.params.id);
       const { name, description } = req.body;
       
+      // Get current category data
+      const currentCategory = await Category.getById(categoryId);
+      if (!currentCategory) {
+        return res.status(404).render('error', {
+          error: 'Not Found',
+          message: 'Category not found'
+        });
+      }
+      
       if (!name || name.trim() === '') {
-        const category = await Category.getById(categoryId);
         return res.render('categories/edit', {
           title: 'Edit Category',
-          category: { ...category, name, description },
+          category: { ...currentCategory, name, description },
           error: 'Category name is required'
         });
       }
 
+      // Track changes
+      const changes = [];
+      if (currentCategory.name !== name.trim()) {
+        changes.push(`Name: "${currentCategory.name}" → "${name.trim()}"`);
+      }
+      if (currentCategory.description !== description?.trim()) {
+        changes.push(`Description updated`);
+      }
+
       await Category.update(categoryId, name.trim(), description?.trim() || '');
       
-      res.redirect('/categories?success=Category updated successfully');
+      // Add changes to success message if any
+      let successMessage = 'Category updated successfully';
+      if (changes.length > 0) {
+        successMessage += `. Changes: ${changes.join(', ')}`;
+      }
+      
+      res.redirect(`/categories?success=${encodeURIComponent(successMessage)}`);
     } catch (error) {
-      console.error('Error updating category:', error);
+      console.error('❌ Error updating category:', error);
       
       if (error.code === '23505') { // Unique violation
         const category = await Category.getById(parseInt(req.params.id));
@@ -172,7 +200,7 @@ const categoryController = {
         hasItems
       });
     } catch (error) {
-      console.error('Error loading delete form:', error);
+      console.error('❌ Error loading delete form:', error);
       res.status(500).render('error', {
         error: 'Server Error',
         message: 'Failed to load delete form'
@@ -201,7 +229,7 @@ const categoryController = {
       await Category.delete(categoryId);
       res.redirect('/categories?success=Category deleted successfully');
     } catch (error) {
-      console.error('Error deleting category:', error);
+      console.error('❌ Error deleting category:', error);
       
       if (error.code === '23503') { // Foreign key violation
         const category = await Category.getById(parseInt(req.params.id));

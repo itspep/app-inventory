@@ -108,3 +108,25 @@
         <% } %>
     </div>
 </div>
+
+<div class="item-detail-secondary">
+    <!-- ... existing code ... -->
+    
+    <div class="info-section">
+        <h3><i class="fas fa-history"></i> Activity</h3>
+        <div class="activity-links">
+            <a href="/items/<%= item.id %>/history" class="btn btn-outline">
+                <i class="fas fa-history"></i> View Edit History
+            </a>
+            <a href="/changes" class="btn btn-outline">
+                <i class="fas fa-exchange-alt"></i> All Recent Changes
+            </a>
+        </div>
+        <p class="activity-info">
+            <small>
+                <i class="fas fa-calendar"></i> Created: <%= new Date(item.created_at).toLocaleString() %><br>
+                <i class="fas fa-sync"></i> Last Updated: <%= new Date(item.updated_at).toLocaleString() %>
+            </small>
+        </p>
+    </div>
+</div>

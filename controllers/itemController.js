@@ -12,6 +12,7 @@ const itemController = {
       res.render('items/index', { 
         title: 'All Items',
         items: items || [],
+        query: '',
         success: req.query.success,
         error: req.query.error
       });
@@ -131,14 +132,14 @@ const itemController = {
       
       const categories = await Category.getAll();
       
-      if (error.code === '23505') { // Unique violation (SKU)
+      if (error.code === '23505') {
         res.render('items/new', {
           title: 'Create New Item',
           item: req.body,
           categories,
           error: 'SKU already exists'
         });
-      } else if (error.code === '23503') { // Foreign key violation
+      } else if (error.code === '23503') {
         res.render('items/new', {
           title: 'Create New Item',
           item: req.body,
@@ -170,6 +171,10 @@ const itemController = {
         });
       }
 
+      // Store original values for change tracking
+      item.original_price = item.price;
+      item.original_stock = item.stock_quantity;
+
       res.render('items/edit', {
         title: 'Edit Item',
         item,
@@ -184,7 +189,7 @@ const itemController = {
     }
   },
 
-  // Update item
+  // Update item with change tracking
   updateItem: async (req, res) => {
     try {
       const itemId = parseInt(req.params.id);
@@ -201,13 +206,19 @@ const itemController = {
         image_url
       } = req.body;
 
-      // Validate required fields
+      const currentItem = await Item.getById(itemId);
+      if (!currentItem) {
+        return res.status(404).render('error', {
+          error: 'Not Found',
+          message: 'Item not found'
+        });
+      }
+
       if (!name || name.trim() === '') {
         const categories = await Category.getAll();
-        const item = await Item.getById(itemId);
         return res.render('items/edit', {
           title: 'Edit Item',
-          item: { ...item, ...req.body },
+          item: { ...currentItem, ...req.body },
           categories,
           error: 'Item name is required'
         });
@@ -215,10 +226,9 @@ const itemController = {
 
       if (!category_id) {
         const categories = await Category.getAll();
-        const item = await Item.getById(itemId);
         return res.render('items/edit', {
           title: 'Edit Item',
-          item: { ...item, ...req.body },
+          item: { ...currentItem, ...req.body },
           categories,
           error: 'Category is required'
         });
@@ -237,23 +247,45 @@ const itemController = {
         image_url: image_url?.trim() || null
       };
 
+      const changes = [];
+      if (currentItem.name !== itemData.name) changes.push(`Name: "${currentItem.name}" → "${itemData.name}"`);
+      if (currentItem.category_id !== itemData.category_id) {
+        const oldCat = await Category.getById(currentItem.category_id);
+        const newCat = await Category.getById(itemData.category_id);
+        changes.push(`Category: "${oldCat?.name || currentItem.category_id}" → "${newCat?.name || itemData.category_id}"`);
+      }
+      if (parseFloat(currentItem.price) !== parseFloat(itemData.price)) {
+        changes.push(`Price: $${parseFloat(currentItem.price).toFixed(2)} → $${parseFloat(itemData.price).toFixed(2)}`);
+      }
+      if (parseInt(currentItem.stock_quantity) !== parseInt(itemData.stock_quantity)) {
+        changes.push(`Stock: ${currentItem.stock_quantity} → ${itemData.stock_quantity}`);
+      }
+      if (currentItem.brand !== itemData.brand) changes.push(`Brand: "${currentItem.brand || 'none'}" → "${itemData.brand || 'none'}"`);
+      if (currentItem.model !== itemData.model) changes.push(`Model: "${currentItem.model || 'none'}" → "${itemData.model || 'none'}"`);
+      if (currentItem.sku !== itemData.sku) changes.push(`SKU: "${currentItem.sku || 'none'}" → "${itemData.sku || 'none'}"`);
+
       const updatedItem = await Item.update(itemId, itemData);
       
-      res.redirect(`/items/${updatedItem.id}?success=Item updated successfully`);
+      let successMessage = 'Item updated successfully';
+      if (changes.length > 0) {
+        successMessage += `. Changes: ${changes.join(', ')}`;
+      }
+      
+      res.redirect(`/items/${updatedItem.id}?success=${encodeURIComponent(successMessage)}`);
     } catch (error) {
       console.error('❌ Error updating item:', error);
       
       const categories = await Category.getAll();
       const item = await Item.getById(parseInt(req.params.id));
       
-      if (error.code === '23505') { // Unique violation (SKU)
+      if (error.code === '23505') {
         res.render('items/edit', {
           title: 'Edit Item',
           item: { ...item, ...req.body },
           categories,
           error: 'SKU already exists'
         });
-      } else if (error.code === '23503') { // Foreign key violation
+      } else if (error.code === '23503') {
         res.render('items/edit', {
           title: 'Edit Item',
           item: { ...item, ...req.body },
@@ -300,10 +332,8 @@ const itemController = {
     try {
       const itemId = parseInt(req.params.id);
       
-      // Check admin password if provided
       if (req.body.admin_password && req.body.admin_password !== process.env.ADMIN_PASSWORD) {
         const item = await Item.getById(itemId);
-        
         return res.render('items/delete', {
           title: 'Delete Item',
           item,
@@ -340,7 +370,7 @@ const itemController = {
       res.render('items/search', {
         title: 'Search Results',
         items: items || [],
-        query
+        query: query
       });
     } catch (error) {
       console.error('❌ Error searching items:', error);

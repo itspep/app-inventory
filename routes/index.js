@@ -38,3 +38,10 @@ router.get('/search', itemController.searchItems);
 router.get('/low-stock', itemController.showLowStock);
 
 module.exports = router;
+
+// Import changes controller
+const changesController = require('../controllers/changesController');
+
+// Changes routes
+router.get('/changes', changesController.showRecentChanges);
+router.get('/items/:id/history', changesController.showItemHistory);

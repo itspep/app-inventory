@@ -18,7 +18,7 @@
                 type="text" 
                 name="q" 
                 placeholder="Search items by name, brand, model, or description..." 
-                value="<%= query || '' %>"
+                value="<%= typeof query !== 'undefined' ? query : '' %>"
                 class="search-input"
             >
             <button type="submit" class="btn btn-primary">
@@ -81,7 +81,7 @@
                         <td class="text-right">$<%= parseFloat(item.price).toFixed(2) %></td>
                         <td>
                             <span class="badge <%= item.stock_quantity > 10 ? 'badge-success' : item.stock_quantity > 0 ? 'badge-warning' : 'badge-danger' %>">
-                                <%= item.stock_quantity %>
+                                <%= item.stock_quantity %> in stock
                             </span>
                         </td>
                         <td class="text-right">$<%= totalValue.toFixed(2) %></td>

@@ -1,0 +1,70 @@
+  // Show delete confirmation
+  showDeleteForm: async (req, res) => {
+    try {
+      const categoryId = parseInt(req.params.id);
+      const category = await Category.getById(categoryId);
+      const itemCount = await Category.getItemCount(categoryId);
+      
+      if (!category) {
+        return res.status(404).render('error', {
+          error: 'Not Found',
+          message: 'Category not found'
+        });
+      }
+
+      res.render('categories/delete', {
+        title: 'Delete Category',
+        category,
+        hasItems: itemCount > 0 ? itemCount : false
+      });
+    } catch (error) {
+      console.error('❌ Error loading delete form:', error);
+      res.status(500).render('error', {
+        error: 'Server Error',
+        message: 'Failed to load delete form'
+      });
+    }
+  },
+
+  // Delete category
+  deleteCategory: async (req, res) => {
+    try {
+      const categoryId = parseInt(req.params.id);
+      const { admin_password } = req.body;
+      
+      // Verify admin password
+      if (!admin_password || admin_password !== process.env.ADMIN_PASSWORD) {
+        const category = await Category.getById(categoryId);
+        const itemCount = await Category.getItemCount(categoryId);
+        
+        return res.render('categories/delete', {
+          title: 'Delete Category',
+          category,
+          hasItems: itemCount > 0 ? itemCount : false,
+          error: 'Incorrect admin password'
+        });
+      }
+
+      await Category.delete(categoryId);
+      res.redirect('/categories?success=Category deleted successfully');
+    } catch (error) {
+      console.error('❌ Error deleting category:', error);
+      
+      const category = await Category.getById(parseInt(req.params.id));
+      const itemCount = await Category.getItemCount(parseInt(req.params.id));
+      
+      if (error.code === '23503') { // Foreign key violation
+        res.render('categories/delete', {
+          title: 'Delete Category',
+          category,
+          hasItems: itemCount,
+          error: 'Cannot delete category that has items. Delete or move the items first.'
+        });
+      } else {
+        res.status(500).render('error', {
+          error: 'Server Error',
+          message: 'Failed to delete category'
+        });
+      }
+    }
+  }

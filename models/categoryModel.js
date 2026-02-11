@@ -103,3 +103,17 @@ const Category = {
 };
 
 module.exports = Category;
+
+  // Get item count for category
+  getItemCount: async (id) => {
+    try {
+      const result = await db.query(
+        'SELECT COUNT(*) FROM items WHERE category_id = $1',
+        [id]
+      );
+      return parseInt(result.rows[0].count);
+    } catch (error) {
+      console.error('Error in Category.getItemCount:', error);
+      throw error;
+    }
+  }

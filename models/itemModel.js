@@ -14,6 +14,7 @@ const Item = {
       );
       return result.rows;
     } catch (error) {
+      console.error('Error in Item.getAll:', error);
       throw error;
     }
   },
@@ -33,6 +34,7 @@ const Item = {
       );
       return result.rows[0];
     } catch (error) {
+      console.error('Error in Item.getById:', error);
       throw error;
     }
   },
@@ -52,6 +54,7 @@ const Item = {
       );
       return result.rows;
     } catch (error) {
+      console.error('Error in Item.getByCategory:', error);
       throw error;
     }
   },
@@ -103,6 +106,7 @@ const Item = {
       );
       return result.rows[0];
     } catch (error) {
+      console.error('Error in Item.create:', error);
       throw error;
     }
   },
@@ -164,6 +168,7 @@ const Item = {
       );
       return result.rows[0];
     } catch (error) {
+      console.error('Error in Item.update:', error);
       throw error;
     }
   },
@@ -177,6 +182,7 @@ const Item = {
       );
       return result.rows[0];
     } catch (error) {
+      console.error('Error in Item.delete:', error);
       throw error;
     }
   },
@@ -200,6 +206,7 @@ const Item = {
       );
       return result.rows;
     } catch (error) {
+      console.error('Error in Item.search:', error);
       throw error;
     }
   },
@@ -214,11 +221,82 @@ const Item = {
          FROM items i
          JOIN categories c ON i.category_id = c.id
          WHERE i.stock_quantity < 5
-         ORDER BY i.stock_quantity`,
+         ORDER BY i.stock_quantity`
       );
       return result.rows;
     } catch (error) {
+      console.error('Error in Item.getLowStock:', error);
       throw error;
+    }
+  },
+
+  // Get item change history
+  getChangeHistory: async (itemId) => {
+    try {
+      // Check if item_changes table exists
+      const tableCheck = await db.query(
+        `SELECT EXISTS (
+          SELECT FROM information_schema.tables 
+          WHERE table_name = 'item_changes'
+        )`
+      );
+      
+      if (!tableCheck.rows[0].exists) {
+        console.log('item_changes table does not exist yet');
+        return [];
+      }
+      
+      const result = await db.query(
+        `SELECT 
+          field_name as field,
+          old_value,
+          new_value,
+          changed_at,
+          changed_by
+         FROM item_changes
+         WHERE item_id = $1
+         ORDER BY changed_at DESC`,
+        [itemId]
+      );
+      return result.rows;
+    } catch (error) {
+      console.error('Error in Item.getChangeHistory:', error);
+      return [];
+    }
+  },
+
+  // Get recent changes across all items
+  getRecentChanges: async (limit = 50) => {
+    try {
+      // Check if item_changes table exists
+      const tableCheck = await db.query(
+        `SELECT EXISTS (
+          SELECT FROM information_schema.tables 
+          WHERE table_name = 'item_changes'
+        )`
+      );
+      
+      if (!tableCheck.rows[0].exists) {
+        console.log('item_changes table does not exist yet');
+        return [];
+      }
+      
+      const result = await db.query(
+        `SELECT 
+          ic.*,
+          i.name as item_name,
+          c.name as category_name
+         FROM item_changes ic
+         JOIN items i ON ic.item_id = i.id
+         JOIN categories c ON i.category_id = c.id
+         ORDER BY ic.changed_at DESC
+         LIMIT $1`,
+        [limit]
+      );
+      return result.rows;
+    } catch (error) {
+      console.error('Error in Item.getRecentChanges:', error);
+      return [];
     }
   }
 };

@@ -3,7 +3,7 @@
     <p class="subtitle">Items with less than 5 units in stock</p>
 </div>
 
-<% if (items.length === 0) { %>
+<% if (!items || items.length === 0) { %>
     <div class="empty-state">
         <i class="fas fa-check-circle fa-3x"></i>
         <h3>No Low Stock Items</h3>
