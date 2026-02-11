@@ -6,16 +6,26 @@
                 <span>ElectroStore</span>
             </a>
             <ul class="nav-links">
-                <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="/categories"><i class="fas fa-list"></i> Categories</a></li>
-                <li><a href="/items"><i class="fas fa-box"></i> All Items</a></li>
-                <li><a href="/low-stock"><i class="fas fa-exclamation-triangle"></i> Low Stock</a></li>
-                <li><a href="/changes"><i class="fas fa-history"></i> Changes</a></li>
+                <li><a href="/" class="<%= title === 'Dashboard' ? 'active' : '' %>">
+                    <i class="fas fa-home"></i> Dashboard
+                </a></li>
+                <li><a href="/categories" class="<%= title === 'Categories' ? 'active' : '' %>">
+                    <i class="fas fa-list"></i> Categories
+                </a></li>
+                <li><a href="/items" class="<%= title === 'All Items' ? 'active' : '' %>">
+                    <i class="fas fa-box"></i> All Items
+                </a></li>
+                <li><a href="/low-stock" class="<%= title === 'Low Stock Items' ? 'active' : '' %>">
+                    <i class="fas fa-exclamation-triangle"></i> Low Stock
+                </a></li>
+                <li><a href="/changes" class="<%= title === 'Recent Changes' ? 'active' : '' %>">
+                    <i class="fas fa-history"></i> Changes
+                </a></li>
             </ul>
             <div class="search-nav">
                 <form action="/search" method="GET" class="nav-search-form">
-                    <input type="text" name="q" placeholder="Search..." class="nav-search-input">
-                    <button type="submit" class="nav-search-btn">
+                    <input type="text" name="q" placeholder="Search products..." class="nav-search-input" aria-label="Search products">
+                    <button type="submit" class="nav-search-btn" aria-label="Search">
                         <i class="fas fa-search"></i>
                     </button>
                 </form>

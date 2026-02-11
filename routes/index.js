@@ -45,3 +45,9 @@ const changesController = require('../controllers/changesController');
 // Changes routes
 router.get('/changes', changesController.showRecentChanges);
 router.get('/items/:id/history', changesController.showItemHistory);
+
+// Import dashboard controller
+const dashboardController = require('../controllers/dashboardController');
+
+// Dashboard route
+router.get('/', dashboardController.getDashboard);

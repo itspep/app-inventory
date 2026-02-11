@@ -1,0 +1,231 @@
+<div class="dashboard">
+    <div class="hero animate-fade-in">
+        <h1><i class="fas fa-store"></i> Electronic Store Inventory</h1>
+        <p class="subtitle">Welcome back! Here's your inventory overview.</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="dashboard-card animate-fade-in">
+            <div class="dashboard-card-header">
+                <div class="dashboard-card-icon">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <div>
+                    <div class="dashboard-card-title">Total Items</div>
+                    <div class="dashboard-card-value"><%= stats.totalItems || 0 %></div>
+                </div>
+            </div>
+            <div class="dashboard-card-footer">
+                <i class="fas fa-chart-line"></i> <%= stats.totalValue ? '$' + stats.totalValue.toFixed(2) : '$0.00' %> total value
+            </div>
+        </div>
+
+        <div class="dashboard-card animate-fade-in" style="animation-delay: 0.1s;">
+            <div class="dashboard-card-header">
+                <div class="dashboard-card-icon">
+                    <i class="fas fa-folder"></i>
+                </div>
+                <div>
+                    <div class="dashboard-card-title">Categories</div>
+                    <div class="dashboard-card-value"><%= stats.totalCategories || 0 %></div>
+                </div>
+            </div>
+            <div class="dashboard-card-footer">
+                <i class="fas fa-tags"></i> <%= stats.categoriesWithItems || 0 %> categories have items
+            </div>
+        </div>
+
+        <div class="dashboard-card animate-fade-in" style="animation-delay: 0.2s;">
+            <div class="dashboard-card-header">
+                <div class="dashboard-card-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <div class="dashboard-card-title">Low Stock</div>
+                    <div class="dashboard-card-value <%= stats.lowStockItems > 0 ? 'text-danger' : '' %>">
+                        <%= stats.lowStockItems || 0 %>
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-card-footer">
+                <a href="/low-stock">View items needing restock →</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card animate-fade-in" style="animation-delay: 0.3s;">
+            <div class="dashboard-card-header">
+                <div class="dashboard-card-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <div>
+                    <div class="dashboard-card-title">Today's Changes</div>
+                    <div class="dashboard-card-value"><%= stats.todaysChanges || 0 %></div>
+                </div>
+            </div>
+            <div class="dashboard-card-footer">
+                <a href="/changes">View recent activity →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="section animate-fade-in" style="animation-delay: 0.4s;">
+            <h2><i class="fas fa-fire"></i> Quick Actions</h2>
+            <div class="actions-grid">
+                <a href="/items/new" class="action-card">
+                    <i class="fas fa-plus-circle"></i>
+                    <h3>Add Item</h3>
+                    <p>Create a new product listing</p>
+                </a>
+                <a href="/categories/new" class="action-card">
+                    <i class="fas fa-folder-plus"></i>
+                    <h3>Add Category</h3>
+                    <p>Create a new product category</p>
+                </a>
+                <a href="/items" class="action-card">
+                    <i class="fas fa-search"></i>
+                    <h3>Browse All</h3>
+                    <p>View and manage inventory</p>
+                </a>
+                <a href="/low-stock" class="action-card">
+                    <i class="fas fa-truck"></i>
+                    <h3>Restock</h3>
+                    <p>View low stock items</p>
+                </a>
+            </div>
+        </div>
+
+        <% if (recentItems && recentItems.length > 0) { %>
+            <div class="section animate-fade-in" style="animation-delay: 0.5s;">
+                <h2><i class="fas fa-clock"></i> Recently Added</h2>
+                <div class="recent-items-list">
+                    <% recentItems.forEach(item => { %>
+                        <a href="/items/<%= item.id %>" class="recent-item">
+                            <div class="recent-item-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="recent-item-info">
+                                <h4><%= item.name %></h4>
+                                <p><%= item.category_name %> • $<%= parseFloat(item.price).toFixed(2) %></p>
+                            </div>
+                            <div class="recent-item-badge">
+                                <span class="badge <%= item.stock_quantity > 10 ? 'badge-success' : item.stock_quantity > 0 ? 'badge-warning' : 'badge-danger' %>">
+                                    <%= item.stock_quantity %> left
+                                </span>
+                            </div>
+                        </a>
+                    <% }); %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<style>
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.action-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    color: var(--dark-color);
+    transition: all 0.3s;
+    border: 1px solid #e5e7eb;
+}
+
+.dark-mode .action-card {
+    background: #1f2937;
+    color: #f9fafb;
+    border-color: #374151;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-color: var(--primary-color);
+}
+
+.action-card i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.action-card h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.action-card p {
+    color: var(--gray-color);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.recent-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.recent-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--dark-color);
+    transition: background 0.3s;
+}
+
+.dark-mode .recent-item {
+    color: #f9fafb;
+}
+
+.recent-item:hover {
+    background: #f9fafb;
+}
+
+.dark-mode .recent-item:hover {
+    background: #2d3748;
+}
+
+.recent-item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+}
+
+.recent-item-info {
+    flex: 1;
+}
+
+.recent-item-info h4 {
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.recent-item-info p {
+    color: var(--gray-color);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.text-danger {
+    color: var(--danger-color);
+}
+</style>
