@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "render-setup": "node scripts/render-setup.js",
+    "railway-setup": "node scripts/railway-setup.js",
     "postinstall": "echo 'Installation complete'"
   },
   "keywords": ["inventory", "electronics", "store", "management"],
