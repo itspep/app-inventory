@@ -7,25 +7,25 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "setup-db": "node scripts/setup-database.js",
-    "seed-db": "node scripts/seed-database.js"
+    "seed-db": "node scripts/seed-database.js",
+    "build": "npm install",
+    "postinstall": "echo 'Installation complete'"
   },
-  "keywords": [
-    "inventory",
-    "electronics",
-    "store",
-    "management"
-  ],
+  "keywords": ["inventory", "electronics", "store", "management"],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.3.1",
-    "ejs": "^4.0.1",
-    "express-ejs-layouts": "^2.5.1",
+    "ejs": "^3.1.9",
     "express": "^4.18.2",
     "method-override": "^3.0.0",
     "pg": "^8.11.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }

@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: electronic-store-inventory
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_USER
+        fromDatabase:
+          name: electronic-store-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: electronic-store-db
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: electronic-store-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: electronic-store-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: electronic-store-db
+          property: database
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+
+databases:
+  - name: electronic-store-db
+    databaseName: inventory_db
+    user: inventory_admin
+    plan: free
