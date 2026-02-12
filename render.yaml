@@ -1,32 +1,14 @@
 services:
   - type: web
     name: electronic-store-inventory
-    env: node
+    runtime: node
+    plan: free
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /test
     envVars:
       - key: NODE_ENV
         value: production
-      - key: DB_USER
-        fromDatabase:
-          name: electronic-store-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: electronic-store-db
-          property: password
-      - key: DB_HOST
-        fromDatabase:
-          name: electronic-store-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: electronic-store-db
-          property: port
-      - key: DB_NAME
-        fromDatabase:
-          name: electronic-store-db
-          property: database
       - key: ADMIN_PASSWORD
         generateValue: true
       - key: SESSION_SECRET
