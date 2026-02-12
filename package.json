@@ -6,9 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "setup-db": "node scripts/setup-database.js",
-    "seed-db": "node scripts/seed-database.js",
-    "build": "npm install",
+    "render-setup": "node scripts/render-setup.js",
     "postinstall": "echo 'Installation complete'"
   },
   "keywords": ["inventory", "electronics", "store", "management"],
@@ -25,7 +23,7 @@
     "nodemon": "^3.0.1"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "node": "18.x",
+    "npm": "9.x"
   }
 }
