@@ -58,9 +58,7 @@
                     <tr>
                         <td>
                             <div class="item-info">
-                                <% if (item.image_url) { %>
-                                    <img src="<%= item.image_url %>" alt="<%= item.name %>" class="item-thumbnail">
-                                <% } %>
+                                <img src="<%= item.image_url || '/images/placeholder.svg' %>" alt="<%= item.name %>" class="item-thumbnail" onerror="this.src='/images/placeholder.svg'">
                                 <div>
                                     <strong><%= item.name %></strong>
                                     <% if (item.model) { %>

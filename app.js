@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const methodOverride = require('method-override');
+const expressLayouts = require('express-ejs-layouts');
 require('dotenv').config();
 
 const { pool } = require('./config/database');
@@ -8,17 +9,31 @@ const { pool } = require('./config/database');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// IMPORTANT: Static files must be served from the correct path
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Log all static file requests for debugging
+app.use((req, res, next) => {
+    if (req.url.startsWith('/css/') || req.url.startsWith('/js/')) {
+        console.log(`📁 Static file requested: ${req.url}`);
+    }
+    next();
+});
+
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Set view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Test database connection on startup
+// Use express-ejs-layouts so `views/layout.ejs` wraps views automatically
+app.use(expressLayouts);
+app.set('layout', 'layout');
+
+// Test database connection
 pool.query('SELECT NOW()', (err, result) => {
   if (err) {
     console.error('❌ Database connection error:', err.stack);
@@ -27,57 +42,41 @@ pool.query('SELECT NOW()', (err, result) => {
   }
 });
 
-// ===== IMPORT ROUTES =====
+// Test route
+app.get('/test', (req, res) => {
+  res.send('✅ Server is working!');
+});
+
+// Test static route
+app.get('/test-static', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Static Test</title>
+        <link rel="stylesheet" href="/css/style.css">
+    </head>
+    <body>
+        <div style="padding: 20px;">
+            <h1 style="color: var(--primary);">Static File Test</h1>
+            <div class="btn btn-primary">Primary Button</div>
+            <div class="btn btn-success">Success Button</div>
+            <div class="btn btn-danger">Danger Button</div>
+            <div class="card" style="margin-top: 20px; padding: 20px;">
+                <h3>Card Test</h3>
+                <p>If you see styled buttons and cards, CSS is working!</p>
+            </div>
+        </div>
+    </body>
+    </html>
+  `);
+});
+
+// Import routes
 const indexRouter = require('./routes/index');
 
-// ===== ROUTES =====
-
-// Test routes (before router)
-app.get('/test', (req, res) => {
-  res.send('✅ Server is working! <a href="/">Go Home</a>');
-});
-
-app.get('/test-db', async (req, res) => {
-  try {
-    const time = await pool.query('SELECT NOW()');
-    const categories = await pool.query('SELECT COUNT(*) FROM categories');
-    const items = await pool.query('SELECT COUNT(*) FROM items');
-    
-    res.json({
-      status: 'ok',
-      database_time: time.rows[0].now,
-      categories: parseInt(categories.rows[0].count),
-      items: parseInt(items.rows[0].count)
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: error.message
-    });
-  }
-});
-
-// Use the router for all routes
+// Use routes
 app.use('/', indexRouter);
-
-// Debug route to see all registered routes
-app.get('/debug-routes', (req, res) => {
-  const routes = [];
-  
-  app._router.stack.forEach((middleware) => {
-    if (middleware.route) {
-      routes.push({
-        path: middleware.route.path,
-        methods: Object.keys(middleware.route.methods)
-      });
-    }
-  });
-  
-  res.json({
-    message: 'Registered routes',
-    routes: routes
-  });
-});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -93,16 +92,13 @@ app.use((req, res) => {
   console.log(`❌ 404: ${req.method} ${req.url}`);
   res.status(404).render('error', { 
     error: '404 - Page Not Found',
-    message: `The page ${req.url} was not found.` 
+    message: 'The page you are looking for does not exist.' 
   });
 });
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`🔗 Test: http://localhost:${PORT}/test`);
-  console.log(`🔗 Test DB: http://localhost:${PORT}/test-db`);
-  console.log(`🔗 Home: http://localhost:${PORT}/`);
-  console.log(`🔗 Categories: http://localhost:${PORT}/categories`);
-  console.log(`🔗 Items: http://localhost:${PORT}/items`);
-  console.log(`🔗 Debug routes: http://localhost:${PORT}/debug-routes`);
+  console.log(`🔍 Test static: http://localhost:${PORT}/test-static`);
+  console.log(`📁 CSS file should be at: http://localhost:${PORT}/css/style.css`);
+  console.log(`📁 JS file should be at: http://localhost:${PORT}/js/main.js`);
 });

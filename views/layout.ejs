@@ -3,11 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> - Electronic Store Inventory</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %> - ElectroStore</title>
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- IMPORTANT: This must match your public directory -->
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <style>
+        /* Fallback inline styles in case external CSS fails */
+        .fallback-message {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+            padding: 1rem;
+            margin: 1rem;
+            border-radius: 0.375rem;
+        }
+    </style>
 </head>
 <body>
+    <div class="fallback-message" style="display: none;" id="css-fallback">
+        ⚠️ CSS is not loading properly. Please check that the file exists at /css/style.css
+    </div>
+
     <header class="header">
         <div class="container">
             <nav class="navbar">
@@ -16,49 +36,43 @@
                     <span>ElectroStore</span>
                 </a>
                 <ul class="nav-links">
-                    <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/"><i class="fas fa-home"></i> Dashboard</a></li>
                     <li><a href="/categories"><i class="fas fa-list"></i> Categories</a></li>
-                    <li><a href="/items"><i class="fas fa-box"></i> All Items</a></li>
+                    <li><a href="/items"><i class="fas fa-box"></i> Items</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
     <main class="container">
-        <% if (success) { %>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i> <%= success %>
-            </div>
-        <% } %>
-        
-        <% if (error) { %>
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-circle"></i> <%= error %>
-            </div>
-        <% } %>
-
         <%- body %>
     </main>
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Electronic Store Inventory System. All rights reserved.</p>
+            <p>&copy; 2024 ElectroStore Inventory System</p>
         </div>
     </footer>
 
-    <script src="/js/main.js"></script>
-     <script src="/js/validation.js"></script>
-    <script src="/js/main.js"></script>
-    <script src="/js/toast.js"></script>
-    <script src="/js/darkmode.js"></script>
-    <script src="/js/loading.js"></script>
-    <script src="/js/validation.js"></script>
-    <script src="/js/update-confirm.js"></script>
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <script>
+        // Check if CSS loaded
+        window.onload = function() {
+            const bodyStyles = window.getComputedStyle(document.body);
+            const bgColor = bodyStyles.backgroundColor;
+            
+            if (bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent') {
+                document.getElementById('css-fallback').style.display = 'block';
+                console.error('❌ CSS failed to load!');
+            } else {
+                console.log('✅ CSS loaded successfully!');
+            }
+        };
+    </script>
     
-    <!-- Skip link for accessibility -->
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    
-    <!-- Main content identifier -->
-    <div id="main-content"></div>
+    <script src="/js/main.js"></script>
 </body>
 </html>

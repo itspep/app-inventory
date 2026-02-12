@@ -4,14 +4,11 @@ const router = express.Router();
 // Import controllers
 const categoryController = require('../controllers/categoryController');
 const itemController = require('../controllers/itemController');
+const changesController = require('../controllers/changesController');
+const dashboardController = require('../controllers/dashboardController');
 
-// Home page
-router.get('/', (req, res) => {
-  res.render('index', { 
-    title: 'Electronic Store Inventory',
-    message: 'Welcome to our inventory management system'
-  });
-});
+// Home page - Dashboard
+router.get('/', dashboardController.getDashboard);
 
 // ===== CATEGORY ROUTES =====
 router.get('/categories', categoryController.listCategories);
@@ -37,17 +34,8 @@ router.delete('/items/:id', itemController.deleteItem);
 router.get('/search', itemController.searchItems);
 router.get('/low-stock', itemController.showLowStock);
 
-module.exports = router;
-
-// Import changes controller
-const changesController = require('../controllers/changesController');
-
 // Changes routes
 router.get('/changes', changesController.showRecentChanges);
 router.get('/items/:id/history', changesController.showItemHistory);
 
-// Import dashboard controller
-const dashboardController = require('../controllers/dashboardController');
-
-// Dashboard route
-router.get('/', dashboardController.getDashboard);
+module.exports = router;
