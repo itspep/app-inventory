@@ -1,61 +1,58 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-console.log('📋 Database Configuration:');
-console.log('  User:', process.env.DB_USER);
-console.log('  Database:', process.env.DB_NAME);
-console.log('  Host:', process.env.DB_HOST);
-console.log('  Port:', process.env.DB_PORT);
+// Railway provides DATABASE_URL environment variable
+const connectionString = process.env.DATABASE_URL;
 
-// Database configuration
+console.log('🔌 Database Configuration:');
+console.log('  DATABASE_URL exists:', !!connectionString);
+
+if (!connectionString) {
+  console.error('❌ DATABASE_URL not found! Make sure you have added a PostgreSQL database in Railway.');
+  process.exit(1);
+}
+
+// Database configuration for Railway
 const pool = new Pool({
-  user: process.env.DB_USER || 'inventory_admin',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'electronic_store_inventory',
-  password: process.env.DB_PASSWORD || '123',
-  port: process.env.DB_PORT || 5432,
+  connectionString: connectionString,
+  ssl: {
+    rejectUnauthorized: false // Required for Railway
+  },
   // Connection settings
-  max: 10,
+  max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000,
 });
 
-// Test connection
-(async () => {
-  try {
-    const client = await pool.connect();
-    console.log('✅ Database connected successfully!');
-    
-    // Test queries
-    const timeResult = await client.query('SELECT NOW()');
-    console.log('📅 Database time:', timeResult.rows[0].now);
-    
-    const categoriesResult = await client.query('SELECT COUNT(*) FROM categories');
-    console.log(`📁 Categories: ${categoriesResult.rows[0].count}`);
-    
-    const itemsResult = await client.query('SELECT COUNT(*) FROM items');
-    console.log(`📦 Items: ${itemsResult.rows[0].count}`);
-    
-    client.release();
-  } catch (error) {
-    console.error('❌ Database connection failed!');
-    console.error('Error:', error.message);
-    console.error('\n💡 Troubleshooting:');
-    console.error('  1. Run: ./recreate-tables.sh');
-    console.error('  2. Check: sudo systemctl status postgresql');
-    console.error('  3. Verify .env file has correct password');
+// Test connection on startup
+pool.connect((err, client, done) => {
+  if (err) {
+    console.error('❌ Database connection failed:', err.message);
+    console.error('  This is expected if you haven't added a PostgreSQL database in Railway yet.');
+    console.error('  Go to your Railway project dashboard and add a PostgreSQL database.');
+  } else {
+    console.log('✅ Database connected successfully');
+    client.query('SELECT NOW()', (err, res) => {
+      done();
+      if (err) {
+        console.error('❌ Query failed:', err.message);
+      } else {
+        console.log('📅 Database time:', res.rows[0].now);
+      }
+    });
   }
-})();
+});
 
 // Query helper
 const query = async (text, params) => {
   try {
-    const result = await pool.query(text, params);
-    return result;
+    const start = Date.now();
+    const res = await pool.query(text, params);
+    const duration = Date.now() - start;
+    console.log(`📊 Executed query (${duration}ms)`);
+    return res;
   } catch (error) {
-    console.error('❌ Query Error:', error.message);
-    console.error('  Query:', text.substring(0, 200));
-    if (params) console.error('  Params:', params);
+    console.error('❌ Query error:', error.message);
     throw error;
   }
 };
