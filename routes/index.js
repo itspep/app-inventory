@@ -39,3 +39,8 @@ router.get('/changes', changesController.showRecentChanges);
 router.get('/items/:id/history', changesController.showItemHistory);
 
 module.exports = router;
+
+// Simple test route that doesn't need database
+router.get('/ping', (req, res) => {
+  res.send('pong');
+});
