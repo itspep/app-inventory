@@ -8,7 +8,7 @@ const changesController = require('../controllers/changesController');
 const dashboardController = require('../controllers/dashboardController');
 
 // Home page - Dashboard
-router.get('/', dashboardController.getDashboard);
+router.get('/dashboard', dashboardController.getDashboard);
 
 // ===== CATEGORY ROUTES =====
 router.get('/categories', categoryController.listCategories);
